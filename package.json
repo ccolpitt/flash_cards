@@ -6,6 +6,7 @@
     "main": "dist/index.js",
     "scripts": {
         "build": "tsc",
+        "start": "tsx src/index.ts",
         "test": "vitest run",
         "test:watch": "vitest"
     },
@@ -13,8 +14,10 @@
         "uuid": "^11.1.0"
     },
     "devDependencies": {
+        "@types/node": "^25.6.0",
         "@types/uuid": "^10.0.0",
         "fast-check": "^3.23.2",
+        "tsx": "^4.21.0",
         "typescript": "^5.7.0",
         "vitest": "^3.1.0"
     }
