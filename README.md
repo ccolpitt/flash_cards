@@ -5,8 +5,9 @@ A simple CLI flashcard quiz app with user tracking, card management, and quiz st
 ## How to play
 
 ```bash
-npx tsx generate-cards.ts   # generate the card deck (run once)
-npx tsx quiz.ts              # take the quiz
+npx tsx generate-cards.ts   # generate 100 cards into data/cards.json (run once)
+npx tsx generate-deck.ts    # create the "All Cards" deck (run once)
+npx tsx quiz.ts              # play the quiz
 ```
 
 Type `q` or `quit` at any answer prompt to exit early and see your score.
@@ -64,44 +65,44 @@ Type `q` or `quit` at any answer prompt to exit early and see your score.
 ### 6. Session & Quiz Orchestration
 
 #### 6a. Session Model
-- [ ] Define `Session` model: `id`, `user_id`, `start_time` (ISO), `quiz_ids` (string[])
-- [ ] Implement `createSession(user_id)` → starts a new session
-- [ ] Implement `addQuizToSession(session_id, quiz_id)` → appends quiz to session
-- [ ] Persist sessions to `data/sessions.json`
+- [x] Define `Session` model: `id`, `user_id`, `start_time` (ISO), `quiz_ids` (string[])
+- [x] Implement `createSession(user_id)` → starts a new session
+- [x] Implement `addQuizToSession(session_id, quiz_id)` → appends quiz to session
+- [x] Persist sessions to `data/sessions.json`
 
 #### 6b. Login Flow
-- [ ] On app start, check for last logged-in user (persist `last_user_id` in `data/app-state.json`)
-- [ ] If found, display "Welcome back, <username>!" with option to "login as someone else"
-- [ ] If "login as someone else" or no last user: prompt for existing user (by name) or create new
-- [ ] After login, create a new Session for this user
-- [ ] Increment user's `num_sessions`
+- [x] On app start, check for last logged-in user (persist `last_user_id` in `data/app-state.json`)
+- [x] If found, display "Welcome back, <username>!" with option to "login as someone else"
+- [x] If "login as someone else" or no last user: prompt for existing user (by name) or create new
+- [x] After login, create a new Session for this user
+- [x] Increment user's `num_sessions`
 
 #### 6c. Deck Selection
-- [ ] Show "Resume" option with last 5 decks played (from user's quiz history)
-- [ ] Show "Search decks" option — search by deck name (substring match)
-- [ ] After deck is selected, prompt for quiz mode: sequential or random
+- [x] Show "Resume" option with last 5 decks played (from user's quiz history)
+- [x] Show "Search decks" option — search by deck name (substring match)
+- [x] After deck is selected, prompt for quiz mode: sequential or random
 
 #### 6d. Quiz Orchestrator
-- [ ] Implement `QuizOrchestrator` class that:
+- [x] Implement `QuizOrchestrator` class that:
   - Loads cards for the selected deck
   - Orders them based on quiz mode (sequential by card order, random via shuffle)
   - Exposes `nextCard()` → returns next Card or null
   - Exposes `isDone()` → returns true when all cards have been shown
   - Tracks correct_count/incorrect_count internally
-- [ ] On each card: display question, wait for input
-- [ ] If user types "q" or "quit": end quiz early
-- [ ] After each answer: record CardStats impression, update orchestrator counts
-- [ ] When `isDone()` or quit: display summary (correct_count, incorrect_count, % correct, time elapsed)
+- [x] On each card: display question, wait for input
+- [x] If user types "q" or "quit": end quiz early
+- [x] After each answer: record CardStats impression, update orchestrator counts
+- [x] When `isDone()` or quit: display summary (correct_count, incorrect_count, % correct, time elapsed)
 
 #### 6e. Mastery Flag
-- [ ] Add `is_mastered` computed property per user+deck
-- [ ] `is_mastered` = true if the user's most recent quiz on that deck got 100% correct
-- [ ] Display mastery status in deck selection menu (e.g., "✓ Mastered" next to deck name)
+- [x] Add `is_mastered` computed property per user+deck
+- [x] `is_mastered` = true if the user's most recent quiz on that deck got 100% correct
+- [x] Display mastery status in deck selection menu (e.g., "✓ Mastered" next to deck name)
 
 ### 7. Seed Data
-- [ ] Update `generate-cards.ts` to use the new Card CRUD (creates cards in `data/cards.json`)
-- [ ] Add a `generate-deck.ts` script that creates a default deck from all cards
-- [ ] Remove old `cards.json` from project root once migration is done
+- [x] Update `generate-cards.ts` to use the new Card CRUD (creates cards in `data/cards.json`)
+- [x] Add a `generate-deck.ts` script that creates a default deck from all cards
+- [x] Remove old `cards.json` from project root once migration is done
 
 ---
 
