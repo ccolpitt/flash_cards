@@ -184,9 +184,11 @@ async function main(): Promise<void> {
 
         console.log(`\nStarting quiz: ${deck.name} (${cards.length} cards, ${mode} mode)\n`);
 
+        let questionNum = 0;
         while (!orchestrator.isDone()) {
+            questionNum++;
             const card = orchestrator.nextCard()!;
-            const answer = await ask(rl, `Q: ${card.question}\nYour answer (or "q" to quit): `);
+            const answer = await ask(rl, `Q${questionNum}: ${card.question}\nYour answer (or "q" to quit): `);
 
             if (answer.trim().toLowerCase() === "q" || answer.trim().toLowerCase() === "quit") {
                 console.log("\nQuitting early...");

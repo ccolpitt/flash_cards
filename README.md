@@ -104,20 +104,78 @@ Type `q` or `quit` at any answer prompt to exit early and see your score.
 - [x] Add a `generate-deck.ts` script that creates a default deck from all cards
 - [x] Remove old `cards.json` from project root once migration is done
 
+### 8. Web App (React + Vite)
+
+#### Architecture
+```
+flashcard-app/
+├── api/             # Express API server (business logic lives here)
+│   ├── routes/      # REST endpoints: /users, /cards, /decks, /quizzes, /sessions
+│   └── server.ts   # Express app entry point
+├── web/             # React frontend (display only — no business logic)
+│   ├── src/
+│   │   ├── pages/   # Login, DeckSelect, Quiz, Import
+│   │   ├── components/  # Reusable UI pieces
+│   │   └── api.ts   # Fetch wrapper to call the API
+│   └── index.html
+├── models/          # Shared type definitions (used by both API and web)
+├── services/        # Business logic (used by API only)
+├── stores/          # Data layer (used by API only)
+└── ...
+```
+
+**Key principle:** Frontend calls API → API calls services → services call stores. Frontend never touches business logic directly.
+
+#### 8a. API Server
+- [ ] Set up Express server in `api/server.ts`
+- [ ] Add routes: POST/GET/PUT/DELETE for /users, /cards, /decks, /quizzes
+- [ ] Add GET /quiz/next-card/:quizId — returns next card (mode logic lives here)
+- [ ] Add GET /decks/:deckId/modes — returns available quiz modes (extensible)
+- [ ] Add POST /quiz/answer — submit answer, returns correct/incorrect + stats
+- [ ] Add POST /import/csv — accepts CSV file, creates cards + deck
+
+#### 8b. React Frontend
+- [ ] Set up React + Vite in `web/` directory
+- [ ] Login page: welcome back / switch user / create new
+- [ ] Deck selection page: recent decks, search, mastery badges
+- [ ] Quiz page: shows question number (Q1, Q2, ...), answer input, quit button
+- [ ] Results page: correct/incorrect count, %, time
+- [ ] Import page: file picker for CSV, deck name input, preview, create
+
+#### 8c. Navigation (React Router)
+- [ ] `/login` → Login/user selection
+- [ ] `/decks` → Deck selection
+- [ ] `/quiz/:deckId` → Active quiz
+- [ ] `/results/:quizId` → Quiz results
+- [ ] `/import` → CSV deck import
+
+#### 8d. CSV Import
+- [ ] CSV format: `question,answers` (answers pipe-separated: "Paris|paris")
+- [ ] Frontend: file picker + deck name input + preview table
+- [ ] API: parse CSV, create cards, create deck with those card IDs
+- [ ] Validation: reject rows with empty question or no answers
+
+#### 8e. Extensible Quiz Modes
+- [ ] API returns available modes from a config (not hardcoded in frontend)
+- [ ] Frontend renders mode buttons dynamically based on API response
+- [ ] Adding a new mode = add it to the API config + implement the ordering logic
+- [ ] Current modes: "sequential", "random". Easy to add "worst-first", "spaced", etc.
 ---
 
-## Architecture (kept simple)
+## Architecture
 
 ```
 flashcard-app/
-├── models/          # Type definitions only (User, Card, Deck, CardStats, Game, Session, Quiz)
-├── services/        # Business logic / APIs (CRUD operations, orchestrator)
-├── stores/          # Data access layer (JsonFileStore today, swap to DB later)
-├── tests/           # Tests structured as API calls (input → expected output)
-├── data/            # Created at runtime — persisted JSON files (gitignored)
-├── node_modules/    # npm packages (auto-installed, gitignored)
+├── api/             # Express API server (business logic access point)
+├── web/             # React frontend (display only)
+├── models/          # Shared type definitions (User, Card, Deck, Quiz, Session, CardStats)
+├── services/        # Business logic (CRUD, orchestrator, stats)
+├── stores/          # Data access layer (JsonFileStore now, DB later)
+├── tests/           # Tests structured as API calls
+├── data/            # Runtime JSON files (gitignored)
 ├── generate-cards.ts
-├── quiz.ts          # Main CLI entry point
+├── generate-deck.ts
+├── quiz.ts          # CLI entry point (still works independently)
 ├── package.json
 └── tsconfig.json
 ```
@@ -126,5 +184,5 @@ flashcard-app/
 - `models/` = "what is a User?" (shape/schema, no logic)
 - `services/` = "how do I create a User?" (business logic, APIs)
 - `stores/` = "where do I save a User?" (JSON files now, Postgres later)
-
-All data stored as flat JSON files in `data/`. No database needed yet.
+- `api/` = HTTP layer that exposes services to the frontend
+- `web/` = React UI that calls the API and renders results
