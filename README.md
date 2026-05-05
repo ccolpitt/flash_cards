@@ -1,6 +1,6 @@
 # Flashcard App
 
-A simple CLI flashcard quiz app with user tracking, card management, and game stats.
+A simple CLI flashcard quiz app with user tracking, card management, and quiz stats.
 
 ## How to play
 
@@ -26,48 +26,77 @@ Type `q` or `quit` at any answer prompt to exit early and see your score.
 - [x] Write tests for User CRUD operations
 
 ### 2. Card Store CRUD
-- [ ] Define `Card` model: `unique_id`, `question`, `answers` (string[]), `version_id`
-- [ ] Implement `createCard(question, answers)` → generates unique_id, version_id=1
-- [ ] Implement `readCard(unique_id)` → returns Card or null
-- [ ] Implement `updateCard(unique_id, fields)` → updates question/answers, increments version_id
-- [ ] Implement `deleteCard(unique_id)` → removes card from store
-- [ ] Implement `listCards()` → returns all cards
-- [ ] Persist cards to `data/cards.json`
-- [ ] Write tests for Card CRUD operations
+- [x] Define `Card` model: `unique_id`, `question`, `answers` (string[]), `version_id`
+- [x] Implement `createCard(question, answers)` → generates unique_id, version_id=1
+- [x] Implement `readCard(unique_id)` → returns Card or null
+- [x] Implement `updateCard(unique_id, fields)` → updates question/answers, increments version_id
+- [x] Implement `deleteCard(unique_id)` → removes card from store
+- [x] Implement `listCards()` → returns all cards
+- [x] Persist cards to `data/cards.json`
+- [x] Write tests for Card CRUD operations
 
 ### 3. Deck CRUD
-- [ ] Define `Deck` model: `unique_id`, `name`, `card_ids` (string[]), `card_count`, `version_id`
-- [ ] Implement `createDeck(name, card_ids)` → generates unique_id, sets card_count, version_id=1
-- [ ] Implement `readDeck(unique_id)` → returns Deck or null
-- [ ] Implement `updateDeck(unique_id, fields)` → update name/card_ids, recalculate card_count, increment version_id
-- [ ] Implement `deleteDeck(unique_id)` → removes deck from store
-- [ ] Implement `listDecks()` → returns all decks
-- [ ] Persist decks to `data/decks.json`
-- [ ] Write tests for Deck CRUD operations
+- [x] Define `Deck` model: `unique_id`, `name`, `card_ids` (string[]), `card_count`, `version_id`
+- [x] Implement `createDeck(name, card_ids)` → generates unique_id, sets card_count, version_id=1
+- [x] Implement `readDeck(unique_id)` → returns Deck or null
+- [x] Implement `updateDeck(unique_id, fields)` → update name/card_ids, recalculate card_count, increment version_id
+- [x] Implement `deleteDeck(unique_id)` → removes deck from store
+- [x] Implement `listDecks()` → returns all decks
+- [x] Persist decks to `data/decks.json`
+- [x] Write tests for Deck CRUD operations
 
 ### 4. Card Stats
-- [ ] Define `CardStats` model: `user_id`, `card_id`, `impressions`, `correct_count`, `first_impression` (ISO date), `last_impression` (ISO date), `last_n_correct` (number), `last_n_incorrect` (number)
-- [ ] Implement `getCardStats(user_id, card_id)` → returns stats or default zeros
-- [ ] Implement `recordImpression(user_id, card_id, correct: boolean)` → updates all metrics
-- [ ] Implement `getUserStats(user_id)` → returns all card stats for a user
-- [ ] Persist stats to `data/card-stats.json`
-- [ ] Write tests for Card Stats operations
+- [x] Define `CardStats` model: `user_id`, `card_id`, `impressions`, `correct_count`, `first_impression` (ISO date), `last_impression` (ISO date), `last_n_correct` (number), `last_n_incorrect` (number)
+- [x] Implement `getCardStats(user_id, card_id)` → returns stats or default zeros
+- [x] Implement `recordImpression(user_id, card_id, correct: boolean)` → updates all metrics
+- [x] Implement `getUserStats(user_id)` → returns all card stats for a user
+- [x] Persist stats to `data/card-stats.json`
+- [x] Write tests for Card Stats operations
 
-### 5. Game Table
-- [ ] Define `Game` model: `unique_id`, `user_id`, `deck_id`, `start_date` (ISO), `time_length` (seconds), `wins` (correct count), `misses` (incorrect count), `mode` ("sequential" | "random")
-- [ ] Implement `createGame(user_id, deck_id, mode)` → starts a new game session
-- [ ] Implement `finishGame(game_id, wins, misses, time_length)` → saves final results
-- [ ] Implement `getGameHistory(user_id)` → returns all games for a user
-- [ ] Persist games to `data/games.json`
-- [ ] Write tests for Game operations
+### 5. Quiz CRUD (consolidated — replaces "Game Table")
+- [x] Define `Quiz` model: `id`, `user_id`, `deck_id`, `start_time` (ISO), `time_length` (seconds), `correct_count`, `incorrect_count`, `mode` ("sequential" | "random")
+- [x] Implement `createQuiz(user_id, deck_id, mode)` → starts a new quiz
+- [x] Implement `finishQuiz(quiz_id, correct_count, incorrect_count, time_length)` → saves final results
+- [x] Implement `getQuizHistory(user_id)` → returns all quizzes for a user
+- [x] Persist quizzes to `data/quizzes.json`
+- [x] Write tests for Quiz operations
 
-### 6. Wire Up Quiz to New Models
-- [ ] Update `quiz.ts` to prompt for user selection/creation at start
-- [ ] Update quiz to prompt for deck selection
-- [ ] Update quiz to create a Game record on start, finish on end
-- [ ] Update quiz to record CardStats after each answer
-- [ ] Increment user's `num_sessions` after each game
-- [ ] Show game summary at end (wins, misses, time)
+### 6. Session & Quiz Orchestration
+
+#### 6a. Session Model
+- [ ] Define `Session` model: `id`, `user_id`, `start_time` (ISO), `quiz_ids` (string[])
+- [ ] Implement `createSession(user_id)` → starts a new session
+- [ ] Implement `addQuizToSession(session_id, quiz_id)` → appends quiz to session
+- [ ] Persist sessions to `data/sessions.json`
+
+#### 6b. Login Flow
+- [ ] On app start, check for last logged-in user (persist `last_user_id` in `data/app-state.json`)
+- [ ] If found, display "Welcome back, <username>!" with option to "login as someone else"
+- [ ] If "login as someone else" or no last user: prompt for existing user (by name) or create new
+- [ ] After login, create a new Session for this user
+- [ ] Increment user's `num_sessions`
+
+#### 6c. Deck Selection
+- [ ] Show "Resume" option with last 5 decks played (from user's quiz history)
+- [ ] Show "Search decks" option — search by deck name (substring match)
+- [ ] After deck is selected, prompt for quiz mode: sequential or random
+
+#### 6d. Quiz Orchestrator
+- [ ] Implement `QuizOrchestrator` class that:
+  - Loads cards for the selected deck
+  - Orders them based on quiz mode (sequential by card order, random via shuffle)
+  - Exposes `nextCard()` → returns next Card or null
+  - Exposes `isDone()` → returns true when all cards have been shown
+  - Tracks correct_count/incorrect_count internally
+- [ ] On each card: display question, wait for input
+- [ ] If user types "q" or "quit": end quiz early
+- [ ] After each answer: record CardStats impression, update orchestrator counts
+- [ ] When `isDone()` or quit: display summary (correct_count, incorrect_count, % correct, time elapsed)
+
+#### 6e. Mastery Flag
+- [ ] Add `is_mastered` computed property per user+deck
+- [ ] `is_mastered` = true if the user's most recent quiz on that deck got 100% correct
+- [ ] Display mastery status in deck selection menu (e.g., "✓ Mastered" next to deck name)
 
 ### 7. Seed Data
 - [ ] Update `generate-cards.ts` to use the new Card CRUD (creates cards in `data/cards.json`)
@@ -80,15 +109,21 @@ Type `q` or `quit` at any answer prompt to exit early and see your score.
 
 ```
 flashcard-app/
-├── models/          # Type definitions (User, Card, Deck, CardStats, Game)
-├── stores/          # JSON file-based CRUD for each model
-├── data/            # Persisted JSON files (users, cards, decks, stats, games)
-├── tests/           # Property-based and unit tests
+├── models/          # Type definitions only (User, Card, Deck, CardStats, Game, Session, Quiz)
+├── services/        # Business logic / APIs (CRUD operations, orchestrator)
+├── stores/          # Data access layer (JsonFileStore today, swap to DB later)
+├── tests/           # Tests structured as API calls (input → expected output)
+├── data/            # Created at runtime — persisted JSON files (gitignored)
+├── node_modules/    # npm packages (auto-installed, gitignored)
 ├── generate-cards.ts
-├── generate-deck.ts
-├── quiz.ts          # Main CLI game loop
+├── quiz.ts          # Main CLI entry point
 ├── package.json
 └── tsconfig.json
 ```
 
-All data stored as flat JSON files in `data/`. No database needed.
+**Folder roles:**
+- `models/` = "what is a User?" (shape/schema, no logic)
+- `services/` = "how do I create a User?" (business logic, APIs)
+- `stores/` = "where do I save a User?" (JSON files now, Postgres later)
+
+All data stored as flat JSON files in `data/`. No database needed yet.
